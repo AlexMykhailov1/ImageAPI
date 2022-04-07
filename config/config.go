@@ -6,6 +6,7 @@ import "github.com/spf13/viper"
 type Config struct {
 	DB
 	SRV
+	Path
 }
 
 // DB stores configuration for database
@@ -21,6 +22,11 @@ type DB struct {
 // SRV stores configuration for the server
 type SRV struct {
 	Port string `mapstructure:"SERVER_PORT"`
+}
+
+// Path stores path environment variables
+type Path struct {
+	Img string `mapstructure:"IMG_PATH"`
 }
 
 // LoadConfig reads configuration from file or environment variables
@@ -42,6 +48,9 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, err
 	}
 	if err := viper.Unmarshal(&cfg.SRV); err != nil {
+		return nil, err
+	}
+	if err := viper.Unmarshal(&cfg.Path); err != nil {
 		return nil, err
 	}
 	return cfg, nil
