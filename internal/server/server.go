@@ -33,8 +33,8 @@ func (s *server) Start() error {
 func (s *server) mapHandlers(router *gin.Engine) {
 	// Init layers
 	repos := repository.NewRepositories(s.db)
-	services := service.NewServices(repos)
-	handlers := delivery.NewHandlers(services)
+	services := service.NewServices(repos, s.cfg)
+	handlers := delivery.NewHandlers(services, s.cfg)
 
 	// Initial path
 	v1 := router.Group("api/v1")
