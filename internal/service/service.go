@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/AlexMykhailov1/ImageAPI/config"
+	"github.com/AlexMykhailov1/ImageAPI/internal/rabbit"
 	"github.com/AlexMykhailov1/ImageAPI/internal/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,6 +20,6 @@ type Services struct {
 }
 
 // NewServices returns a pointer to new Services
-func NewServices(repos *repository.Repositories, cfg *config.Config) *Services {
-	return &Services{UploadService: NewUploadService(repos.ImageRepos, cfg)}
+func NewServices(repos *repository.Repositories, cfg *config.Config, rb *rabbit.Rabbit) *Services {
+	return &Services{UploadService: NewUploadService(repos.ImageRepos, cfg, rb)}
 }

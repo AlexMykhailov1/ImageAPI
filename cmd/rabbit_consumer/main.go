@@ -1,12 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/AlexMykhailov1/ImageAPI/config"
 	"github.com/AlexMykhailov1/ImageAPI/internal/rabbit"
-	"github.com/AlexMykhailov1/ImageAPI/internal/server"
-	"github.com/AlexMykhailov1/ImageAPI/storage/postgres"
-	"github.com/gin-gonic/gin"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -34,25 +30,9 @@ func main() {
 		}
 	}(rb.Connection)
 
-	// Connect to postgres
-	db, err := postgres.NewPostgres(cfg)
+	// Start consume messages from image queue
+	err = rb.ConsumeImgID(cfg)
 	if err != nil {
-		log.Fatalf("Error connecting to database: %v\n", err.Error())
-	}
-
-	// Defer close database connection
-	defer func(db *sql.DB) {
-		err = db.Close()
-		if err != nil {
-			log.Printf("Error closing database connection: %v\n", err.Error())
-		}
-	}(db)
-
-	// Create new server instance
-	s := server.NewServer(gin.Default(), db, cfg, rb)
-
-	// Run server
-	if err = s.Start(); err != nil {
-		log.Fatalf("Error starting server: %v\n", err.Error())
+		log.Fatalf("Error consuming messages:%v", err.Error())
 	}
 }

@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"github.com/AlexMykhailov1/ImageAPI/models/image"
+	"github.com/AlexMykhailov1/ImageAPI/internal/models/image"
 	"log"
 )
 

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"fmt"
 	"github.com/AlexMykhailov1/ImageAPI/config"
+	"github.com/AlexMykhailov1/ImageAPI/internal/models/image"
+	"github.com/AlexMykhailov1/ImageAPI/internal/rabbit"
 	"github.com/AlexMykhailov1/ImageAPI/internal/repository"
-	"github.com/AlexMykhailov1/ImageAPI/models/image"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"mime/multipart"
@@ -14,11 +14,12 @@ import (
 type uploadService struct {
 	imageRepos repository.ImageRepos
 	cfg        *config.Config
+	rb         *rabbit.Rabbit
 }
 
 // NewUploadService returns a pointer to new uploadService
-func NewUploadService(ur repository.ImageRepos, cfg *config.Config) *uploadService {
-	return &uploadService{imageRepos: ur, cfg: cfg}
+func NewUploadService(ur repository.ImageRepos, cfg *config.Config, rb *rabbit.Rabbit) *uploadService {
+	return &uploadService{imageRepos: ur, cfg: cfg, rb: rb}
 }
 
 func (us *uploadService) UploadImage(c *gin.Context, file *multipart.FileHeader) (uuid.UUID, error) {
@@ -32,18 +33,19 @@ func (us *uploadService) UploadImage(c *gin.Context, file *multipart.FileHeader)
 	// Create image object
 	img := image.NewImage(id, file.Filename)
 
-	// Save image object in the database
-	err := us.imageRepos.AddImage(c.Request.Context(), img)
-	if err != nil {
+	// Call database repository layer to save image object in the database
+	if err := us.imageRepos.AddImage(c.Request.Context(), img); err != nil {
 		return uuid.Nil, err
 	}
 
 	// Save image in the local storage
-	fmt.Println(us.cfg.Img + file.Filename)
-	err = c.SaveUploadedFile(file, us.cfg.Img+file.Filename)
-	if err != nil {
+	if err := c.SaveUploadedFile(file, us.cfg.Path.Img+file.Filename); err != nil {
 		return uuid.Nil, err
 	}
-	// TODO add image uuid in queue
+
+	// Send image id to the queue
+	if err := us.rb.SendImgID(us.cfg, id); err != nil {
+		return uuid.Nil, err
+	}
 	return id, nil
 }
