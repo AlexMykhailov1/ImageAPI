@@ -33,20 +33,35 @@ func SprintImageName(uuid uuid.UUID, quality int, imgName string) (name string) 
 }
 
 // GetQuality returns image quality from image name in format uuid.quality.imageType
-func GetQuality(name string) (*int, error) {
+func GetQuality(name string) (int, error) {
 	s := strings.Split(name, ".")
 	q := s[len(s)-2]
 	// Check for error
 	if q != "100" && q != "75" && q != "50" && q != "25" {
 		err := errors.New("failed to retrieve quality")
-		return nil, err
+		return 0, err
 	}
 	// Convert string to int
 	quality, err := strconv.Atoi(q)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &quality, nil
+	return quality, nil
+}
+
+// GetImgType returns image type from its name(uuid.quality.type) as a Content-Type header
+func GetImgType(name string) (string, error) {
+	s := strings.Split(name, ".")
+	t := s[len(s)-1]
+	switch t {
+	case "png":
+		return "image/png", nil
+	case "jpg":
+		return "image/jpeg", nil
+	default:
+		err := errors.New("wrong image format")
+		return "", err
+	}
 }
 
 // SetNameQuality changes quality in given name to given quality
