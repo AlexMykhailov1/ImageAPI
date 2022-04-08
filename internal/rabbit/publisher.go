@@ -2,13 +2,12 @@ package rabbit
 
 import (
 	"github.com/AlexMykhailov1/ImageAPI/config"
-	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 	"log"
 )
 
-// SendImgID sends given image uuid to the specific queue from the config file
-func (r *Rabbit) SendImgID(cfg *config.Config, uuid uuid.UUID) error {
+// SendImgID sends given image name to the specific queue from the config file
+func (r *Rabbit) SendImgID(cfg *config.Config, name string) error {
 	ch, err := r.Connection.Channel()
 	if err != nil {
 		return err
@@ -29,7 +28,7 @@ func (r *Rabbit) SendImgID(cfg *config.Config, uuid uuid.UUID) error {
 		false,           // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(uuid.String()),
+			Body:        []byte(name),
 		})
 	return nil
 }
