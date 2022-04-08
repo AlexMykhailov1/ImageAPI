@@ -2,6 +2,7 @@ package rabbit
 
 import (
 	"github.com/AlexMykhailov1/ImageAPI/config"
+	"github.com/AlexMykhailov1/ImageAPI/pkg/optimizer"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -39,8 +40,13 @@ func (r *Rabbit) ConsumeImgID(cfg *config.Config) error {
 	go func() {
 		for data := range msgs {
 			log.Printf("Received a message: %s", data.Body)
+			msg := string(data.Body)
 			go func() {
-				//TODO call optimizer
+				err = optimizer.SaveLessQuality(cfg, msg)
+				if err != nil {
+					log.Printf("Error processing image:%v", err.Error())
+					return
+				}
 			}()
 		}
 	}()
