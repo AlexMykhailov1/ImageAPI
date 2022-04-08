@@ -39,7 +39,7 @@ func (us *uploadHandler) UploadImage(c *gin.Context) {
 	if err != nil {
 		log.Printf("Could not upload image: %v\n", err.Error())
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"message": err.Error()})
-
+		return
 	}
 
 	// Get Content-Type

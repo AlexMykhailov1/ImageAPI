@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-// ConsumeImgID consumes image id's from a queue and sends it for the optimization
+// ConsumeImgID consumes image names from a queue and sends it for the optimization
 func (r *Rabbit) ConsumeImgID(cfg *config.Config) error {
 	ch, err := r.Connection.Channel()
 	if err != nil {
