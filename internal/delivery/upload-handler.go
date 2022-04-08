@@ -28,6 +28,7 @@ func (us *uploadHandler) InitUploadRoutes(rg *gin.RouterGroup) {
 	upload.POST("/images", us.UploadImage) // Upload one image
 }
 
+// UploadImage handles image uploading to the server and passes it to the next layer for further processing
 func (us *uploadHandler) UploadImage(c *gin.Context) {
 	// Set maximum image size
 	const maxbytes int64 = 1024 * 1024 * 8 // 8 Mb

@@ -6,6 +6,7 @@ import (
 	"github.com/AlexMykhailov1/ImageAPI/internal/models/image"
 )
 
+// ImageRepos stores all method of imageRepos struct
 type ImageRepos interface {
 	AddImage(ctx context.Context, img *image.Image) error
 }

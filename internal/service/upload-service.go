@@ -22,12 +22,13 @@ func NewUploadService(ur repository.ImageRepos, cfg *config.Config, rb *rabbit.R
 	return &uploadService{imageRepos: ur, cfg: cfg, rb: rb}
 }
 
+// UploadImage implements all the logic after the image was uploaded to the server
 func (us *uploadService) UploadImage(c *gin.Context, file *multipart.FileHeader) (uuid.UUID, error) {
 	// Create new uuid for the image
 	id := uuid.New()
 
 	// Set the desired image name
-	const quality = "100"
+	const quality = 100
 	file.Filename = image.SprintImageName(id, quality, file.Filename)
 
 	// Create image object
@@ -44,7 +45,7 @@ func (us *uploadService) UploadImage(c *gin.Context, file *multipart.FileHeader)
 	}
 
 	// Send image id to the queue
-	if err := us.rb.SendImgID(us.cfg, id); err != nil {
+	if err := us.rb.SendImgID(us.cfg, img.Name); err != nil {
 		return uuid.Nil, err
 	}
 	return id, nil
